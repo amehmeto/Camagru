@@ -10,7 +10,7 @@ import * as Bcrypt from 'bcrypt';
 export class UserService {
     constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
-    async createUser(addedUser: CreateUserDto): Promise<User | Message> {
+    async createUser(addedUser: CreateUserDto): Promise<User> {
         try {
             await this.checkCredentialsParamsAreUnique(addedUser)
             this.checkUserPasswordIsStrongEnough(addedUser)

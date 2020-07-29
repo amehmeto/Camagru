@@ -15,7 +15,7 @@ export class UserController {
     async createUser(
         @Res() res: Response,
         @Body() createUserDto: CreateUserDto
-        ): Promise<Response> {
+    ): Promise<Response> {
         const user = await this.userService.createUser(createUserDto)
         return res.status(HttpStatus.CREATED).json(user)
     }

@@ -79,6 +79,15 @@ describe('AppController (e2e)', () => {
         })
     })
 
+    it('/authentification/verify/:jwtToken (GET)', () => {
+      const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvaG55Iiwic3ViIjoiNWYyMThmMWE0YTkxZGU4MmE5OGUyOGI5IiwiaWF0IjoxNTk2MDM0ODQyLCJleHAiOjE1OTYwMzQ4NzJ9.vFLtU4n2leb6LKx10NW0ZcBQmvXAa8n7Rnvb_NrkjCw'
+      return request(app.getHttpServer())
+        .get('authentification/verify/' + TOKEN)
+        .expect(HttpStatus.OK)
+        .expect('Content-Type', /json/)
+        .expect({ message: 'User account now active'})
+    })
+
     it('should refuse to create a user if the password isn\'t strong enough', () => {
       return request(app.getHttpServer())
         .post('/authentification/register')

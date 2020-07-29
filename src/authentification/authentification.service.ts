@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { User } from '../user/user.interface';
 import { JwtService } from '@nestjs/jwt'
 import * as Bcrypt from 'bcrypt'
+import * as colors from 'colors/safe'
 
 @Injectable()
 export class AuthentificationService {
@@ -25,13 +26,19 @@ export class AuthentificationService {
         return Bcrypt.compare(passwordAttempt, retrievedUser.password);
     }
 
-    async generateJwtToken(user: any) {
-        const payload = { username: user._doc.username, sub: user._doc._id }
+    generateJwtToken(user: any) {
+        const payload = { username: user.username, sub: user._id }
         return this.jwtService.sign(payload);
     }
 
-    generateEmailValidationToken(username: string): string {
-        
-        return ''
+    generateEmailValidationToken(user: User): string {
+        const payload = { username: user.username, sub: user._id }
+        const jwtSignOptions = { expiresIn: '30s' }
+        return this.jwtService.sign(payload, jwtSignOptions)
+    }
+
+    sendEmailConfirmation(token: string) {
+        console.log(colors.green('Veuillez confirmer votre compte en visitant le lien suivant :'))
+        console.log(colors.green('authentification/verify/' + token))
     }
 }
