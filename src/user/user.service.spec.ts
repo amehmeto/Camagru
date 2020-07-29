@@ -1,16 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthentificationService } from './authentification.service';
+import { UserService } from './user.service';
 import { MongoClient } from 'mongodb';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthentificationModule } from './authentification.module';
-import { JwtModule } from '@nestjs/jwt';
-import JwtDecode from 'jwt-decode'
-import { jwtConstants } from './constants';
+import { UserModule } from './user.module'
 
-describe('AuthentificationService', () => {
-  let service: AuthentificationService;
+describe('UserService', () => {
+  let service: UserService;
   let db: any;
-  let module: TestingModule ;
+  let module: TestingModule;
   let connection: MongoClient;
 
   beforeAll(async () => {
@@ -19,7 +16,7 @@ describe('AuthentificationService', () => {
       useUnifiedTopology: true,
     })
     db = connection.db('camagru')
-  });
+  })
 
   afterAll(async () => {
     await connection.close()
@@ -30,18 +27,14 @@ describe('AuthentificationService', () => {
     module = await Test.createTestingModule({
       imports: [
         MongooseModule.forRoot('mongodb://localhost/camagru'),
-        AuthentificationModule,
-        JwtModule.register({
-          secret: jwtConstants.secret,
-          signOptions: { expiresIn: '60s' },
-        }),
+        UserModule,
       ],
-      providers: [AuthentificationService],
+      providers: [UserService],
     }).compile();
 
-    service = module.get<AuthentificationService>(AuthentificationService);
+    service = module.get<UserService>(UserService);
   });
-
+  
   afterEach(async () => {
     module.close()
   })
@@ -50,13 +43,7 @@ describe('AuthentificationService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should generate an email validation JWT token', () => {
-    const generatedToken = service.generateEmailValidationToken('Arthur')
-    const decodedToken = JwtDecode(generatedToken)
-    expect(decodedToken).toMatchObject({ username: 'Arthur' })
-  })
-
-  it.skip('shoud insert a new user into the collection', async () => {
+  it('shoud insert a new user into the collection', async () => {
     const users = db.collection('users')
 
     const mockUser = { 
@@ -66,6 +53,7 @@ describe('AuthentificationService', () => {
       phone: '0612323454',
       created_at: new Date(),
     }
+    await service.createUser(mockUser)
 
     const insertedUser = await users.findOne({ username: 'Johny'})
     expect(insertedUser._id).toBeDefined()
