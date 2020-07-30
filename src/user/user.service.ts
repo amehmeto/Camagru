@@ -3,7 +3,6 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { User } from './user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Message } from 'src/types';
 import * as Bcrypt from 'bcrypt';
 
 @Injectable()

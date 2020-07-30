@@ -1,4 +1,4 @@
-import { Controller, Post, Res, Request, Body, UseGuards, Get, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Res, Request, Body, UseGuards, Get, HttpStatus, Param } from '@nestjs/common';
 import { Response } from 'express'
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '..//user/user.service';
@@ -14,7 +14,7 @@ export class AuthentificationController {
     ) { }
 
     @Post('register')
-    async register( @Res() res: Response, @Body() createUserDto: CreateUserDto
+    async register(@Res() res: Response, @Body() createUserDto: CreateUserDto
     ) {
         try {
             const user = await this.userService.createUser(createUserDto)
@@ -44,7 +44,12 @@ export class AuthentificationController {
     }
 
     @Get('verify/:jwtToken')
-    verifyUserAccountCreation(@Res() res: Response) {
+    verifyUserAccountCreation(@Res() res: Response, @Param('jwtToken') jwtToken: string) {
+        try {
+            this.authService.verifyAccountCreation(jwtToken)
+        } catch (e) {
+            console.error(e)
+        }
         return res.status(HttpStatus.OK).json({ message: 'User account now active'})
     }
 }

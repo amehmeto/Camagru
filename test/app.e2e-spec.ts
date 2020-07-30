@@ -61,10 +61,11 @@ describe('AppController (e2e)', () => {
   });
 
   describe('Authentification', () => {
+    const AUTH_ROUTE = '/authentification/'
 
-    it('/authentification/register (POST)', () => {
+    it(AUTH_ROUTE + 'register (POST)', () => {
       return request(app.getHttpServer())
-        .post('/authentification/register')
+        .post(AUTH_ROUTE + 'register')
         .send({
           username: 'Johny',
           email: 'wesh@alors.fr',
@@ -79,10 +80,10 @@ describe('AppController (e2e)', () => {
         })
     })
 
-    it('/authentification/verify/:jwtToken (GET)', () => {
-      const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvaG55Iiwic3ViIjoiNWYyMThmMWE0YTkxZGU4MmE5OGUyOGI5IiwiaWF0IjoxNTk2MDM0ODQyLCJleHAiOjE1OTYwMzQ4NzJ9.vFLtU4n2leb6LKx10NW0ZcBQmvXAa8n7Rnvb_NrkjCw'
+    it(AUTH_ROUTE +'verify/:jwtToken (GET)', () => {
+      const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5c'
       return request(app.getHttpServer())
-        .get('authentification/verify/' + TOKEN)
+        .get(AUTH_ROUTE + 'verify/' + TOKEN)
         .expect(HttpStatus.OK)
         .expect('Content-Type', /json/)
         .expect({ message: 'User account now active'})
@@ -90,7 +91,7 @@ describe('AppController (e2e)', () => {
 
     it('should refuse to create a user if the password isn\'t strong enough', () => {
       return request(app.getHttpServer())
-        .post('/authentification/register')
+        .post(AUTH_ROUTE + 'register')
         .send({
           username: 'Johny',
           email: 'wesh@alors.fr',
@@ -106,7 +107,7 @@ describe('AppController (e2e)', () => {
 
     it('should successfully return a JWT token', async () => {
       return request(app.getHttpServer())
-        .post('/authentification/login')
+        .post(AUTH_ROUTE + 'login')
         .send({
           username: 'Jaja',
           password: 'T0pS3cr3t$',
@@ -121,7 +122,7 @@ describe('AppController (e2e)', () => {
 
     it('should reject unauthorized due to wrong password', async () => {
       return request(app.getHttpServer())
-        .post('/authentification/login')
+        .post(AUTH_ROUTE + 'login')
         .send({
           username: 'Jaja',
           password: 'nimportequoi',
@@ -162,25 +163,28 @@ describe('AppController (e2e)', () => {
         .expect(async (res) => expect(res.body).toMatchObject(dummyUsers))
     })
     it.skip('users/:id (GET)', () => { })
-    it.skip('users/ (POST)', () => {
+    it('users/ (POST)', () => {
       return request(app.getHttpServer())
         .post('/users')
         .send({
           username: 'Johny',
           email: 'wesh@alors.fr',
           phone: '0612323454',
-          password: 'TOPSECRET'
+          password: 'T0pS3cr3t$',
         })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
           expect(res.body._id).toBeDefined()
           expect(res.body.created_at).toBeDefined()
+          console.log(res.body)
           expect(res.body).toMatchObject({
-            username: 'Johny',
-          email: 'wesh@alors.fr',
-          phone: '0612323454',
-          password: 'TOPSECRET',
+            username: "Johny",
+            email: "wesh@alors.fr",
+            phone: "0612323454",
+            isActive: false,
           })
+          expect(res.body.password).toBeDefined()
+          expect(res.body.password).not.toBe('T0pS3cr3t$')
         })
     })
     it.skip('users/:id (DELETE)', () => { })

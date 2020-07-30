@@ -5,5 +5,6 @@ export const UserSchema = new Mongoose.Schema({
     email: String,
     phone: String,
     password: String,
+    isActive: Boolean,
     created_at: { type: Date, default: Date.now }
 })

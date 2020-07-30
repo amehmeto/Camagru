@@ -25,7 +25,6 @@ describe('AuthentificationService', () => {
   });
 
   afterAll(async () => {
-    await db.collection('users').deleteOne({ username: 'Johny' })
     await connection.close();
     await db.close();
   });
@@ -48,6 +47,7 @@ describe('AuthentificationService', () => {
   });
 
   afterEach(async () => {
+    await db.collection('users').deleteOne({ username: 'Johny' })
     module.close();
   });
 
@@ -88,5 +88,20 @@ describe('AuthentificationService', () => {
     expect(insertedUser.created_at).toBeDefined();
 
     await users.deleteOne({ username: 'Johny' });
-  });
+  })
+
+  it('should activate user in DB when token is right', async () => {
+    const dumbUser = await userService.createUser({
+      username: "Johny",
+      email: "wesh@alors.fr",
+      phone: "0611223344",
+      password: "T0pS3cr3t$",
+      created_at: new Date()
+    })
+
+    const token = service.generateEmailValidationToken(dumbUser)
+    service.verifyAccountCreation(token)
+    const user = await userService.getUserById(dumbUser._id)
+    expect(user?.isActive).toBeTruthy
+  })
 });

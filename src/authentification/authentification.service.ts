@@ -5,6 +5,7 @@ import { User } from '../user/user.interface';
 import { JwtService } from '@nestjs/jwt'
 import * as Bcrypt from 'bcrypt'
 import * as colors from 'colors/safe'
+import * as jwtDecode from 'jwt-decode';
 
 @Injectable()
 export class AuthentificationService {
@@ -40,5 +41,18 @@ export class AuthentificationService {
     sendEmailConfirmation(token: string) {
         console.log(colors.green('Veuillez confirmer votre compte en visitant le lien suivant :'))
         console.log(colors.green('authentification/verify/' + token))
+    }
+
+    verifyAccountCreation(token: string) {
+        const decodedToken: any = jwtDecode(token)
+        let user: any
+        if (this.isTokenStillNotExpired(decodedToken))
+            user = this.userModel.findOneAndUpdate({ username: decodedToken.username }, { isActive: true} )
+        else 
+            console.error('EXPIRED')
+    }
+
+    isTokenStillNotExpired(decodedToken: any) {
+        return (decodedToken.exp < Date.now())
     }
 }
